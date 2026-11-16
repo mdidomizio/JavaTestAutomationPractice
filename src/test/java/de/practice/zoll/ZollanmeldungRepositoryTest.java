@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ZollanmeldungRepositoryTest {
 
@@ -40,6 +40,18 @@ class ZollanmeldungRepositoryTest {
 
         // Compare only the ids: short and readable
         List<Integer> ids = liste.stream().map(Zollanmeldung::id).toList();
-        assertEquals(List.of(1), ids);
+        assertEquals(List.of(6, 1), ids);
+    }
+
+    @Test
+    void declarationsNotOpenOrNotAboveGrenzwert_areNotOnPruefliste() throws SQLException {
+        List<Integer> ids = repository.findPruefliste(new BigDecimal("150.00"))
+                .stream().map(Zollanmeldung::id).toList();
+
+        assertFalse(ids.contains(2), "ABGESCHLOSSEN darf nicht auf der Liste sein");
+        assertFalse(ids.contains(3), "IN_PRUEFUNG darf nicht auf der Liste sein");
+        assertFalse(ids.contains(4), "ABGESCHLOSSEN darf nicht auf der Liste sein");
+        assertFalse(ids.contains(5), "Wert genau 150.00 darf nicht auf der Liste sein");
+        assertFalse(ids.contains(7), "Wert unter 150.00 darf nicht auf der Liste sein");
     }
 }

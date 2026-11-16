@@ -30,8 +30,8 @@ public class ZollanmeldungRepository {
     public List<Zollanmeldung> findPruefliste(BigDecimal grenzwert) throws SQLException {
         String sql = "SELECT id, warennummer, ursprungsland, zollwert, status, eingangsdatum "
                 + "FROM zollanmeldung "
-                + "WHERE status <> 'ABGESCHLOSSEN' AND zollwert > ? "
-                + "ORDER BY eingangsdatum DESC";
+                + "WHERE status = 'OFFEN' AND zollwert > ? "
+                + "ORDER BY eingangsdatum ASC";
 
         List<Zollanmeldung> result = new ArrayList<>();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
