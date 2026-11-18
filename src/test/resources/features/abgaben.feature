@@ -9,7 +9,37 @@ Funktionalität: Zollberechnung (REQ-03)
     Wenn der Zoll für einen Zollwert von 1000,00 EUR berechnet wird
     Dann beträgt der Zoll 45,00 EUR
 
-  # TODO 1: Szenariogrundriss für die Freigrenze (REQ-03 b) mit einer Beispiele-Tabelle
-  # TODO 2: Szenario für die kaufmännische Rundung (REQ-03 a)
-  # TODO 3: Szenario "Tarifservice nicht erreichbar" (REQ-03 d)
-  # TODO 4: Szenario für einen negativen Zollwert (REQ-03 c) - dafür brauchst du einen neuen Schritt
+  Szenariogrundriss: Zollwert bis zur Freigrenze ist zollfrei
+    Angenommen der Zollsatz für Warennummer "84713000" aus "CN" beträgt 4,5 Prozent
+    Wenn der Zoll für einen Zollwert von <zollwert> EUR berechnet wird
+    Dann beträgt der Zoll 0,00 EUR
+    Und der Tarifservice wird nicht abgefragt
+
+    Beispiele:
+      | zollwert |
+      | 0,00     |
+      | 100,00   |
+      | 149,99   |
+      | 150,00   |
+
+  Szenario: Zollwert knapp über der Freigrenze ist zollpflichtig
+    Angenommen der Zollsatz für Warennummer "84713000" aus "CN" beträgt 4,5 Prozent
+    Wenn der Zoll für einen Zollwert von 150,01 EUR berechnet wird
+    Dann beträgt der Zoll 6,75 EUR
+
+  #  151.00 x 4.5 / 100 = 6.795 -> kaufmännisch gerundet  -> 6.80
+  Szenario: Exakt halber Cent wird aufgerundet
+    Angenommen der Zollsatz für Warennummer "84713000" aus "CN" beträgt 4,5 Prozent
+    Wenn der Zoll für einen Zollwert von 151,00 EUR berechnet wird
+    Dann beträgt der Zoll 6,80 EUR
+
+  Szenario: Tarifservice nicht erreichbar
+    Angenommen der Tarifservice ist nicht erreichbar
+    Wenn der Zoll für einen Zollwert von 151,00 EUR berechnet wird
+    Dann wird ein Berechnungsfehler gemeldet
+
+  Szenario: Negativer Zollwert wird abgelehnt
+    Angenommen der Zollsatz für Warennummer "84713000" aus "CN" beträgt 4,5 Prozent
+    Wenn der Zoll für einen Zollwert von -0,01 EUR berechnet wird
+    Dann wird der Zollwert als ungültig abgelehnt
+    Und der Tarifservice wird nicht abgefragt

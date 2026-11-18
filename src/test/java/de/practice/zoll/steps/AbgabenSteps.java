@@ -70,6 +70,11 @@ public class AbgabenSteps {
         assertInstanceOf(AbgabenBerechnungException.class, fehler);
     }
 
+    @Then("wird der Zollwert als ungültig abgelehnt")
+    public void wirdDerZollwertAlsUngueltigAbgelehnt() {
+        assertInstanceOf(IllegalArgumentException.class, fehler);
+    }
+
     @Then("der Tarifservice wird nicht abgefragt")
     public void derTarifserviceWirdNichtAbgefragt() {
         assertEquals(0, tarifServiceAufrufe);
