@@ -6,6 +6,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpTimeoutException;
+import java.time.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,7 +39,8 @@ public class HttpTarifService implements TarifService {
     @Override
     public BigDecimal getZollsatz(String warennummer, String ursprungsland) {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/tarife/" + warennummer + "?country=" + ursprungsland))
+                .uri(URI.create(baseUrl + "/tarife/" + warennummer + "?land=" + ursprungsland))
+                .timeout(Duration.ofSeconds(2))
                 .header("Accept", "application/json")
                 .GET()
                 .build();
@@ -52,7 +55,7 @@ public class HttpTarifService implements TarifService {
             throw new TarifServiceNichtErreichbarException("Anfrage unterbrochen");
         }
 
-        if (response.statusCode() == 500) {
+        if (response.statusCode() >= 500 && response.statusCode() <= 599 ) {
             throw new TarifServiceNichtErreichbarException("Serverfehler " + response.statusCode());
         }
 
