@@ -22,7 +22,7 @@ Funktionalität: Zollberechnung (REQ-03)
       | 149,99   |
       | 150,00   |
 
-  Szenario: Zollwert knapp über der Freigrenze ist zollpflichtig
+  Szenario: Zollwert knapp über der Freig renze ist zollpflichtig
     Angenommen der Zollsatz für Warennummer "84713000" aus "CN" beträgt 4,5 Prozent
     Wenn der Zoll für einen Zollwert von 150,01 EUR berechnet wird
     Dann beträgt der Zoll 6,75 EUR
