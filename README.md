@@ -28,3 +28,27 @@ Requirement REQ-01 is in `WarennummerValidator.java`.
 - Lesson 4: test data and SQL
 - Lesson 5: Cucumber, the same requirement written as Given / When / Then
 - Lesson 6: Selenide, a UI test in the browser
+
+## Lesson 7: Playwright browser tests with Page Objects
+
+Target: https://www.saucedemo.com (public demo shop with `data-test` attributes).
+
+The first run downloads the browsers automatically (takes a minute).
+
+Run only the UI tests:
+mvn test -Dtest='de.practice.ui.**'
+Watch the browser:
+mvn test -Dtest='de.practice.ui.**' -Dheadless=false
+
+Structure:
+- `BaseUiTest`: browser setup and teardown, new context per test
+- `pages/`: Page Objects (selectors and actions, no assertions)
+- `*Test`: scenarios and assertions
+
+Next steps:
+1. CartPage and CheckoutPage, full checkout test
+2. @ParameterizedTest over users
+3. Mobile viewport variant
+4. GitHub Actions workflow, upload the Playwright trace on failure
+5. CLAUDE.md with rules for coding agents (selector strategy, where assertions go)
+

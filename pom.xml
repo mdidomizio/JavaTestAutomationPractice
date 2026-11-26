@@ -59,6 +59,13 @@
       <version>3.5.4</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>com.microsoft.playwright</groupId>
+      <artifactId>playwright</artifactId>
+      <version>1.49.0</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
