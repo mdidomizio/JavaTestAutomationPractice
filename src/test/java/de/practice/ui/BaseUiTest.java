@@ -19,6 +19,7 @@ import org.junit.jupiter.api.TestInstance;
 public abstract class BaseUiTest {
 
     protected static final String BASE_URL = "https://www.saucedemo.com";
+    protected static final String PASSWORD = "secret_sauce"; // public demo password on saucedemo.com
 
     private Playwright playwright;
     private Browser browser;
