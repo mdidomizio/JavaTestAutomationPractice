@@ -1,54 +1,68 @@
-# Zoll testing practice
+# Java Test Automation Practice
 
-Small Java project for practising test automation.
-Topic: customs data, like ATLAS.
+A Java project where I practise test automation step by step, one topic per branch and pull request.
 
-## Setup (once)
+Lessons 1–6 test a small customs domain (inspired by ATLAS, the German customs system): validators for tariff numbers and country codes, a duty calculator, a repository with SQL queries and an HTTP client for a tariff service. Lesson 7 adds Playwright browser tests against [saucedemo.com](https://www.saucedemo.com), a public demo shop.
 
-1. Install IntelliJ IDEA Community (free). It can download a JDK for you (version 17 or newer).
-2. Open this folder in IntelliJ: File > Open > select the folder `zoll-testing-practice`.
-   IntelliJ recognises `pom.xml` as a Maven project and downloads JUnit by itself.
-3. Open `src/test/java/.../WarennummerValidatorTest.java` and click the green arrow next to the class name.
-   The example test should pass.
+## Tech stack
 
-## Lesson 1: JUnit 5 and boundary values
+Java 17 · Maven · JUnit 5 · Mockito · H2 (SQL) · Cucumber / Gherkin · WireMock · Playwright for Java
 
-Requirement REQ-01 is in `WarennummerValidator.java`.
+## Running the tests
 
-1. Write the tests marked TODO 1 to 6. Every test is a method with `@Test`
-   that calls `validator.isValid(...)` and checks the result with `assertTrue` or `assertFalse`.
-2. Run all tests. At least one will fail. That means you found a bug.
-3. Write down the bug like a bug report: steps, expected result, actual result, severity, priority.
-4. Only then fix the bug in `WarennummerValidator.java` and run the tests again until everything is green.
+Requirements: JDK 17 or newer, Maven.
 
-## Coming next
+```bash
+mvn test                                  # all tests
+mvn test -Dtest='de.practice.zoll.**'     # domain tests (lessons 1–6)
+mvn test -Dtest='de.practice.ui.**'       # browser tests (lesson 7)
+mvn test -Dtest='de.practice.ui.**' -Dheadless=false   # watch the browser
+```
 
-- Lesson 2: `@ParameterizedTest`, one test with many inputs (equivalence classes in a table)
-- Lesson 3: Mockito, testing a class that depends on another service
-- Lesson 4: test data and SQL
-- Lesson 5: Cucumber, the same requirement written as Given / When / Then
-- Lesson 6: Selenide, a UI test in the browser
+The first Playwright run downloads Chromium automatically.
 
-## Lesson 7: Playwright browser tests with Page Objects
+## Project structure
 
-Target: https://www.saucedemo.com (public demo shop with `data-test` attributes).
+```
+src/main/java/de/practice/zoll/     customs domain code under test
+src/test/java/de/practice/zoll/     unit, SQL, WireMock and Cucumber tests
+src/test/java/de/practice/ui/       Playwright tests
+src/test/java/de/practice/ui/pages/ Page Objects
+src/test/resources/                 Gherkin feature files, SQL schema and test data
+```
 
-The first run downloads the browsers automatically (takes a minute).
+## Lessons
 
-Run only the UI tests:
-mvn test -Dtest='de.practice.ui.**'
-Watch the browser:
-mvn test -Dtest='de.practice.ui.**' -Dheadless=false
+### 1. JUnit 5 and boundary values
+`WarennummerValidatorTest`: boundary tests for the 8-digit tariff number (REQ-01). The tests found a bug in the validator; I documented it like a bug report (steps, expected and actual result, severity, priority) before fixing it.
 
-Structure:
-- `BaseUiTest`: browser setup and teardown, new context per test
-- `pages/`: Page Objects (selectors and actions, no assertions)
-- `*Test`: scenarios and assertions
+### 2. Parameterized tests
+`WarennummerValidatorTest`, `LaendercodeValidatorTest`: equivalence classes as tables with `@ParameterizedTest`, `@ValueSource` and `@CsvSource`, including null and empty input.
 
-Next steps:
-1. CartPage and CheckoutPage, full checkout test
-2. @ParameterizedTest over users
-3. Mobile viewport variant
-4. GitHub Actions workflow, upload the Playwright trace on failure
-5. CLAUDE.md with rules for coding agents (selector strategy, where assertions go)
+### 3. Mockito
+`AbgabenRechnerTest`: the duty calculator depends on a `TarifService`, which is mocked. Covers the normal case, rounding of half cents, the €150 duty-free limit, negative values and an unreachable tariff service.
 
+### 4. Test data and SQL
+`ZollanmeldungRepositoryTest`: queries run against an in-memory H2 database, set up from `schema.sql` and `testdata.sql` before each test. Checks which customs declarations end up on the inspection list.
+
+### 5. Cucumber
+`abgaben.feature` with `AbgabenSteps`: the duty calculation requirements written as Given / When / Then scenarios.
+
+### 6. WireMock
+`HttpTarifServiceTest`: the HTTP client is tested against a simulated tariff API. Covers a successful response, request headers and parameters, server errors (500, 502, 503, 599) and a slow response that exceeds the timeout.
+
+### 7. Playwright with Page Objects
+Browser tests against saucedemo.com.
+
+- `BaseUiTest`: one browser per test class, a fresh browser context per test, so tests don't share cookies or cart state
+- `pages/`: `LoginPage`, `InventoryPage`, `CartPage`. They hold selectors and actions only; assertions stay in the tests
+- Selectors use `data-test` attributes, which don't change when texts or styling change
+- `LoginTest`: login parameterized over several users, the locked-out user's error message, and the same login on a desktop (1280×720) and a mobile (390×844) viewport
+- `InventoryTest`: cart badge after adding two products, the added product shows up in the cart, removing the last product hides the badge
+
+## Next steps
+
+- Sorting tests on the inventory page (`sortBy` is already in `InventoryPage`)
+- Checkout flow with a `CheckoutPage`
+- GitHub Actions workflow that runs the tests on every pull request and uploads the Playwright trace when a test fails
+- `CLAUDE.md` with rules for coding agents (selector strategy, where assertions go)
